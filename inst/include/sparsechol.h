@@ -2,6 +2,7 @@
 #define SPARSECHOL_H
 #include <Rcpp.h>
 #include <vector>
+#include <cmath>
 // Code and methods from : https://fossies.org/linux/SuiteSparse/LDL/Doc/ldl_userguide.pdf
 // Author : Tim Davies
 
@@ -137,6 +138,14 @@ class SparseChol{
       for (j = 0 ; j < n ; j++)
       {
         x[j] /= D[j];
+      }
+    }
+    
+    void ldl_d2solve(double* x){
+      int j ;
+      for (j = 0 ; j < n ; j++)
+      {
+        x[j] /= sqrt(D[j]);
       }
     }
     

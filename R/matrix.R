@@ -7,7 +7,9 @@
 #' @return A matrix of class `dsCMatrix`
 #' @export
 sparse_L <- function(mat){
-  return(Matrix::sparseMatrix(i = mat$Ai, p=mat$Ap, x=mat$Ax, triangular = TRUE))
+  M <- Matrix::sparseMatrix(i = mat$Ai, p=mat$Ap, x=mat$Ax, triangular = TRUE)
+  diag(M) <- 1
+  return(M)
 }
 
 #' Generate matrix D from `sparse_chol` output
