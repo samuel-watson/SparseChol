@@ -15,6 +15,15 @@
 #' @param Ax values of the non-zero matrix entries
 #' @return A list with elements n, Ai, Ap, Ax (corresponding to above arguments) for matrix L, and element D, which 
 #' contains the diagonal values of matrix D.
+#' @examples
+#' n <- 10
+#' Ap  <- c(0, 1, 2, 3, 4, 6, 7, 9, 11, 15, ANZ)
+#' Ai <- c(1, 2, 3, 4, 2,5, 6, 5,7, 5,8, 1,5,8,9, 2,5,7,10)
+#' Ax = c(1.7, 1., 1.5, 1.1, .02,2.6, 1.2, .16,1.3, .09,1.6,
+#'           .13,.52,.11,1.4, .01,.53,.56,3.1)
+#' out <-sparse_chol(n,Ap,Ai,Ax)
+#' sparse_L(out)
+#' sparse_D(out)
 sparse_chol <- function(n, Ap, Ai, Ax) {
     .Call(`_SparseChol_sparse_chol`, n, Ap, Ai, Ax)
 }

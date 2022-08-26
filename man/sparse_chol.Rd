@@ -27,3 +27,13 @@ Generates the LDL decomposition of a symmetrix, sparse matrix using the method
 described by Timothy Davis (see references). Required input is a matrix
 in sparse format from the matrix package, see \link[Matrix]{sparseMatrix}
 }
+\examples{
+n <- 10
+Ap  <- c(0, 1, 2, 3, 4, 6, 7, 9, 11, 15, ANZ)
+Ai <- c(1, 2, 3, 4, 2,5, 6, 5,7, 5,8, 1,5,8,9, 2,5,7,10)
+Ax = c(1.7, 1., 1.5, 1.1, .02,2.6, 1.2, .16,1.3, .09,1.6,
+          .13,.52,.11,1.4, .01,.53,.56,3.1)
+out <-sparse_chol(n,Ap,Ai,Ax)
+sparse_L(out)
+sparse_D(out)
+}
