@@ -1,0 +1,27 @@
+Package: SparseChol
+Type: Package
+Title: Sparse Cholesky LDL Decomposition of Symmetric Matrices
+Version: 0.1.2
+Date: 2022-08-16
+Author@R: c(person("Sam", "Watson", email = "S.I.Watson@bham.ac.uk",
+                  role = c("aut", "cre"))
+Maintainer: Sam Watson <S.I.Watson@bham.ac.uk>
+Description: Sparse cholesky decomposition.
+License: GPL (>= 2)
+Imports: 
+    Rcpp (>= 1.0.7)
+LinkingTo: 
+    Rcpp (>= 0.12.0)
+RoxygenNote: 7.2.1
+NeedsCompilation: yes
+Author: Sam Watson [aut, cre],
+          Timothy A. David[aut]
+URL: https://github.com/samuel-watson/SparseChol
+BugReports: https://github.com/samuel-watson/SparseChol/issues
+Suggests: 
+    testthat
+Biarch: true
+Depends: 
+    R (>= 3.4.0)
+SystemRequirements: GNU make
+Encoding: UTF-8
