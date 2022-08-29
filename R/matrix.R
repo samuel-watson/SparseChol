@@ -36,7 +36,7 @@ LL_Cholesky <- function(mat){
   out <- sparse_chol(length(mat@p)-1,mat@p,mat@i,mat@x)
   M <- Matrix::sparseMatrix(i = out$Ai+1, p=out$Ap, x=out$Ax, triangular = TRUE)
   diag(M) <- 1
-  return(M%*%Matrix::Diagonal(x = sqrt(mat$D)))
+  return(M%*%Matrix::Diagonal(x = sqrt(out$D)))
 }
 
 #' Generate LDL decomposition from Matrix class `dsCMatrix`
