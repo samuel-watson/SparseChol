@@ -29,17 +29,18 @@ Rcpp::List sparse_chol(int n,
                        std::vector<int> Ap,
                        std::vector<int> Ai,
                        std::vector<double> Ax){
-  sparse mat;
+  sparse mat(Ap);
   mat.n = n;
-  mat.Ap = Ap;
   mat.Ai = Ai;
-  std::for_each(mat.Ai.begin(), mat.Ai.end(), [](int &n){ n--; });
+  if(Ai[0] != 0)std::for_each(mat.Ai.begin(), mat.Ai.end(), [](int &n){ n--; });
+  if(Ap[0] != 0)std::for_each(mat.Ap.begin(), mat.Ap.end(), [](int &n){ n--; });
   mat.Ax = Ax;
   
   SparseChol chol(&mat);
   int d = chol.ldl_numeric();
   Rcpp::Rcout << "d: " << d;
-  std::for_each(chol.L->Ai.begin(), chol.L->Ai.end(), [](int &n){ n++; });
+  // if(Ai[0] != 0)std::for_each(chol.L->Ai.begin(), chol.L->Ai.end(), [](int &n){ n++; });
+  // if(Ap[0] != 0)std::for_each(chol.L->Ap.begin(), chol.L->Ap.end(), [](int &n){ n++; });
   return Rcpp::List::create(_["n"] = chol.L->n,_["Ap"] = chol.L->Ap,
                             _["Ai"] = chol.L->Ai,_["Ax"] = chol.L->Ax,
                             _["D"] = chol.D);

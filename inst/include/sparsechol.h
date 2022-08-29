@@ -11,6 +11,11 @@ struct sparse {
   std::vector<int> Ap;
   std::vector<int> Ai;
   std::vector<double> Ax;
+  sparse(std::vector<int> p): Ap(p) {
+    n = Ap.size() - 1;
+    Ai = std::vector<int>(Ap[n]);
+    Ax = std::vector<double>(Ap[n]);
+  }
 };
 
 class SparseChol{
@@ -18,6 +23,7 @@ class SparseChol{
   std::vector<int> Flag;
   std::vector<int> Parent;
   std::vector<int> Pattern;
+  std::vector<int> LAp;
   public:
     sparse* A_;
     sparse* L;
@@ -30,12 +36,14 @@ class SparseChol{
       sparse* A
     ): Flag(A->n), Parent(A->n), Pattern(A->n), A_(A), Lnz(A->n) {
       n = A_->n;
-      L = new sparse;
-      L->n = n;
-      L->Ap = std::vector<int>(n+1);
+      LAp = std::vector<int>(n+1);
       ldl_symbolic();
-      L->Ai = std::vector<int>(L->Ap[n]);
-      L->Ax = std::vector<double>(L->Ap[n]);
+      L = new sparse(LAp);
+      //L->n = n;
+      //L->Ap = std::vector<int>(n+1);
+      
+      // L->Ai = std::vector<int>(L->Ap[n]);
+      // L->Ax = std::vector<double>(L->Ap[n]);
       D = std::vector<double>(n);
       Y = std::vector<double>(n);
     }
@@ -66,10 +74,10 @@ class SparseChol{
         }
       }
       // construct Lp index array from Lnz column counts */
-      L->Ap[0] = 0 ;
+      LAp[0] = 0 ;
       for (int k = 0 ; k < n ; k++)
       {
-        L->Ap[k+1] = L->Ap[k] + Lnz[k] ;
+        LAp[k+1] = LAp[k] + Lnz[k] ;
       }
     }
     

@@ -7,7 +7,7 @@
 #' @return A matrix of class `dsCMatrix`
 #' @export
 sparse_L <- function(mat){
-  M <- Matrix::sparseMatrix(i = mat$Ai, p=mat$Ap, x=mat$Ax, triangular = TRUE)
+  M <- Matrix::sparseMatrix(i = mat$Ai+1, p=mat$Ap, x=mat$Ax, triangular = TRUE)
   diag(M) <- 1
   return(M)
 }
@@ -23,3 +23,35 @@ sparse_L <- function(mat){
 sparse_D <- function(mat){
   return(Matrix::Diagonal(x = mat$D))
 }
+
+#' Generate Cholesky decomposition from Matrix class `dsCMatrix`
+#' 
+#' Generates the Cholesky decomposition L as A == LL^T from a 
+#' sparse matrix
+#' 
+#' @param mat A matrix of class `dsCMatrix`
+#' @return A matrix of class `ddiMatrix`
+#' @export
+LL_Cholesky <- function(mat){
+  out <- sparse_chol(length(mat@p)-1,mat@p,mat@i,mat@x)
+  M <- Matrix::sparseMatrix(i = out$Ai+1, p=out$Ap, x=out$Ax, triangular = TRUE)
+  diag(M) <- 1
+  return(M%*%Matrix::Diagonal(x = sqrt(mat$D)))
+}
+
+#' Generate LDL decomposition from Matrix class `dsCMatrix`
+#' 
+#' Generates the Cholesky decomposition L as A == LL^T from a sparse 
+#' matrix
+#' 
+#' @param mat A matrix of class `dsCMatrix`
+#' @return A list of matrices L and D
+#' @export
+LDL_Cholesky <- function(mat){
+  out <- sparse_chol(length(mat@p)-1,mat@p,mat@i,mat@x)
+  M <- Matrix::sparseMatrix(i = out$Ai+1, p=out$Ap, x=out$Ax, triangular = TRUE)
+  diag(M) <-1
+  return(list(L = M, D = Matrix::Diagonal(x=out$D)))
+}
+
+
