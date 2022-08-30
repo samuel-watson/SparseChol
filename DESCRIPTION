@@ -6,7 +6,7 @@ Date: 2022-08-16
 Author@R: c(person("Sam", "Watson", email = "S.I.Watson@bham.ac.uk",
                   role = c("aut", "cre"))
 Maintainer: Sam Watson <S.I.Watson@bham.ac.uk>
-Description: Sparse cholesky decomposition.
+Description: Sparse LDL decomposition of symmetric matrices and solvers
 License: GPL (>= 2)
 Imports: 
     Rcpp (>= 1.0.7)
@@ -15,7 +15,7 @@ LinkingTo:
 RoxygenNote: 7.2.1
 NeedsCompilation: yes
 Author: Sam Watson [aut, cre],
-          Timothy A. David[aut]
+          Timothy A. Davis [aut]
 URL: https://github.com/samuel-watson/SparseChol
 BugReports: https://github.com/samuel-watson/SparseChol/issues
 Suggests: 
