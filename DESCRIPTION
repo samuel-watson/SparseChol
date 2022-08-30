@@ -1,17 +1,19 @@
 Package: SparseChol
 Type: Package
 Title: Sparse Cholesky LDL Decomposition of Symmetric Matrices
-Version: 0.1.2
+Version: 0.1.1
 Date: 2022-08-16
 Author@R: c(person("Sam", "Watson", email = "S.I.Watson@bham.ac.uk",
                   role = c("aut", "cre"))
 Maintainer: Sam Watson <S.I.Watson@bham.ac.uk>
-Description: Sparse LDL decomposition of symmetric matrices and solvers
+Description: C++ implementation of sparse LDL decomposition of symmetric matrices and solvers. Provides the header file
+ `sparsechol.h` that specifies the `SparseChol` class to implement sparse LDL decomposition in Rcpp functions. A limited 
+ set of R functions that implement the method are also included.
 License: GPL (>= 2)
 Imports: 
     Rcpp (>= 1.0.7)
 LinkingTo: 
-    Rcpp (>= 0.12.0)
+    Rcpp (>= 1.0.7)
 RoxygenNote: 7.2.1
 NeedsCompilation: yes
 Author: Sam Watson [aut, cre],
@@ -22,6 +24,7 @@ Suggests:
     testthat
 Biarch: true
 Depends: 
-    R (>= 3.4.0)
+    R (>= 3.4.0),
+    Matrix (>= 1.3-4)
 SystemRequirements: GNU make
 Encoding: UTF-8

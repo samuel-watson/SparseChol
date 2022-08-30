@@ -5,6 +5,7 @@
 #' 
 #' @param mat List returned by `sparse_chol`
 #' @return A matrix of class `dsCMatrix`
+#' @importFrom Matrix sparseMatrix 
 #' @export
 sparse_L <- function(mat){
   M <- Matrix::sparseMatrix(i = mat$Ai+1, p=mat$Ap, x=mat$Ax, triangular = TRUE)
@@ -19,6 +20,7 @@ sparse_L <- function(mat){
 #' 
 #' @param mat List returned by `sparse_chol`
 #' @return A matrix of class `ddiMatrix`
+#' @importFrom Matrix Diagonal
 #' @export
 sparse_D <- function(mat){
   return(Matrix::Diagonal(x = mat$D))
@@ -31,6 +33,7 @@ sparse_D <- function(mat){
 #' 
 #' @param mat A matrix of class `dsCMatrix`
 #' @return A matrix of class `ddiMatrix`
+#' @importFrom Matrix sparseMatrix Diagonal
 #' @export
 LL_Cholesky <- function(mat){
   out <- sparse_chol(length(mat@p)-1,mat@p,mat@i,mat@x)
@@ -46,6 +49,7 @@ LL_Cholesky <- function(mat){
 #' 
 #' @param mat A matrix of class `dsCMatrix`
 #' @return A list of matrices L and D
+#' @importFrom Matrix sparseMatrix Diagonal
 #' @export
 LDL_Cholesky <- function(mat){
   out <- sparse_chol(length(mat@p)-1,mat@p,mat@i,mat@x)
