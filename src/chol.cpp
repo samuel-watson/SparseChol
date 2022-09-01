@@ -1,4 +1,4 @@
-#include "../inst/include/sparsechol.h"
+#include "../inst/include/SparseChol.h"
 using namespace Rcpp;
 
 //' Sparse Cholesky decomposition

@@ -7,7 +7,7 @@ Author@R: c(person("Sam", "Watson", email = "S.I.Watson@bham.ac.uk",
                   role = c("aut", "cre"))
 Maintainer: Sam Watson <S.I.Watson@bham.ac.uk>
 Description: C++ implementation of sparse LDL decomposition of symmetric matrices and solvers. Provides the header file
- `sparsechol.h` that specifies the `SparseChol` class to implement sparse LDL decomposition in Rcpp functions. A limited 
+ `SparseChol.h` that specifies the `SparseChol` class to implement sparse LDL decomposition in Rcpp functions. A limited 
  set of R functions that implement the method are also included.
 License: GPL (>= 2)
 Imports: 
