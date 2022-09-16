@@ -1,10 +1,31 @@
+/*
+
+ This code is adapted from the LDL code reported at https://fossies.org/linux/SuiteSparse/LDL/Doc/ldl_userguide.pdf
+ distributed under the GNU Lesser General Public License.
+ 
+ LDL Copyright (c) 2005-2013 by Timothy A. Davis.
+ LDL is also available under other licenses; contact the author for details.
+ http://suitesparse.com
+
+--------------------------------------------------------------------------------
+
+LDL is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+LDL is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+ */
+
 #ifndef SPARSECHOL_H
 #define SPARSECHOL_H
 #include <Rcpp.h>
 #include <vector>
 #include <cmath>
-// Code and methods from : https://fossies.org/linux/SuiteSparse/LDL/Doc/ldl_userguide.pdf
-// Author : Tim Davies
+
 
 struct sparse {
   int n;
