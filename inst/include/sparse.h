@@ -138,7 +138,7 @@ public:
     // this function has no checks on dimensions
     sparse AB;
     double val;
-    int i,j,k;
+    int i,j;
     intvec tmpAi;
     dblvec tmpAx;
     for(i = 0; i<n; i++){
@@ -150,7 +150,7 @@ public:
       for(j = B.Ap[i]; j < B.Ap[i+1]; j++){
         auto elem = std::lower_bound(tmpAi.begin(),tmpAi.end(),B.Ai[j]);
         int idx = elem - tmpAi.begin();
-        if(elem!=tmpAi.end() && *elem==B.Ai[k]){
+        if(elem!=tmpAi.end() && *elem==B.Ai[j]){
           tmpAx[idx] += B.Ax[j];
         } else {
           tmpAi.insert(elem,B.Ai[j]);
@@ -167,7 +167,7 @@ public:
     return *this;
   };
   sparse& operator*=(const sparse& B){
-    if(m != B.n)Rcpp::stop("wrong dimension");
+    if(m != B.n)Rcpp::stop("wrong dimension in sparse-sparse multiplication");
     sparse AB;
     double val;
     intvec tmpAi;
@@ -215,7 +215,7 @@ inline sparse operator*(sparse A, const sparse& B){
 }
 
 inline dblvec operator*(const sparse& A, const dblvec& B){
-  if(A.m != B.size())Rcpp::stop("wrong dimension");
+  if(A.m != B.size())Rcpp::stop("wrong dimension in sparse-vector multiplication");
   dblvec AB(A.n,0.0);
   double val;
   int i,j;
