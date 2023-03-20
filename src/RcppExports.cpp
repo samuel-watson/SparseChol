@@ -11,9 +11,9 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// sparse_chol
-Rcpp::List sparse_chol(int n, std::vector<int> Ap, std::vector<int> Ai, std::vector<double> Ax);
-RcppExport SEXP _SparseChol_sparse_chol(SEXP nSEXP, SEXP ApSEXP, SEXP AiSEXP, SEXP AxSEXP) {
+// sparse_chol_crs
+Rcpp::List sparse_chol_crs(int n, std::vector<int> Ap, std::vector<int> Ai, std::vector<double> Ax);
+RcppExport SEXP _SparseChol_sparse_chol_crs(SEXP nSEXP, SEXP ApSEXP, SEXP AiSEXP, SEXP AxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -21,13 +21,37 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::vector<int> >::type Ap(ApSEXP);
     Rcpp::traits::input_parameter< std::vector<int> >::type Ai(AiSEXP);
     Rcpp::traits::input_parameter< std::vector<double> >::type Ax(AxSEXP);
-    rcpp_result_gen = Rcpp::wrap(sparse_chol(n, Ap, Ai, Ax));
+    rcpp_result_gen = Rcpp::wrap(sparse_chol_crs(n, Ap, Ai, Ax));
+    return rcpp_result_gen;
+END_RCPP
+}
+// sparse_chol
+SEXP sparse_chol(Rcpp::NumericMatrix mat);
+RcppExport SEXP _SparseChol_sparse_chol(SEXP matSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type mat(matSEXP);
+    rcpp_result_gen = Rcpp::wrap(sparse_chol(mat));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dense_to_sparse
+Rcpp::List dense_to_sparse(Rcpp::NumericMatrix mat);
+RcppExport SEXP _SparseChol_dense_to_sparse(SEXP matSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type mat(matSEXP);
+    rcpp_result_gen = Rcpp::wrap(dense_to_sparse(mat));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_SparseChol_sparse_chol", (DL_FUNC) &_SparseChol_sparse_chol, 4},
+    {"_SparseChol_sparse_chol_crs", (DL_FUNC) &_SparseChol_sparse_chol_crs, 4},
+    {"_SparseChol_sparse_chol", (DL_FUNC) &_SparseChol_sparse_chol, 1},
+    {"_SparseChol_dense_to_sparse", (DL_FUNC) &_SparseChol_dense_to_sparse, 1},
     {NULL, NULL, 0}
 };
 

@@ -36,7 +36,7 @@ sparse_D <- function(mat){
 #' @importFrom Matrix sparseMatrix Diagonal
 #' @export
 LL_Cholesky <- function(mat){
-  out <- sparse_chol(length(mat@p)-1,mat@p,mat@i,mat@x)
+  out <- sparse_chol_crs(length(mat@p)-1,mat@p,mat@i,mat@x)
   M <- Matrix::sparseMatrix(i = out$Ai+1, p=out$Ap, x=out$Ax, triangular = TRUE)
   diag(M) <- 1
   return(M%*%Matrix::Diagonal(x = sqrt(out$D)))
@@ -52,7 +52,7 @@ LL_Cholesky <- function(mat){
 #' @importFrom Matrix sparseMatrix Diagonal
 #' @export
 LDL_Cholesky <- function(mat){
-  out <- sparse_chol(length(mat@p)-1,mat@p,mat@i,mat@x)
+  out <- sparse_chol_crs(length(mat@p)-1,mat@p,mat@i,mat@x)
   M <- Matrix::sparseMatrix(i = out$Ai+1, p=out$Ap, x=out$Ax, triangular = TRUE)
   diag(M) <-1
   return(list(L = M, D = Matrix::Diagonal(x=out$D)))

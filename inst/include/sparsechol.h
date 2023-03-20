@@ -22,51 +22,49 @@ Lesser General Public License for more details.
 
 #ifndef SPARSECHOL_H
 #define SPARSECHOL_H
-#include <Rcpp.h>
-#include <vector>
 #include <cmath>
+#include "sparse.h"
 
-
-struct sparse {
+class SparseChol {
   int n;
-  std::vector<int> Ap;
-  std::vector<int> Ai;
-  std::vector<double> Ax;
-  sparse(std::vector<int> p): Ap(p) {
-    n = Ap.size() - 1;
-    Ai = std::vector<int>(Ap[n]);
-    Ax = std::vector<double>(Ap[n]);
-  }
-};
-
-class SparseChol{
-  int n;
-  std::vector<int> Flag;
-  std::vector<int> Parent;
-  std::vector<int> Pattern;
-  std::vector<int> LAp;
+  intvec Flag;
+  intvec Parent;
+  intvec Pattern;
+  intvec LAp;
   public:
-    sparse* A_;
-    sparse* L;
-    std::vector<int> Lnz;
-    std::vector<double> D;
-    std::vector<double> Y;
-    
+    sparse A_;
+    sparse L;
+    intvec Lnz;
+    dblvec D;
+    dblvec Y;
     
     SparseChol(
-      sparse* A
-    ): Flag(A->n), Parent(A->n), Pattern(A->n), A_(A), Lnz(A->n) {
-      n = A_->n;
-      LAp = std::vector<int>(n+1);
+      const sparse& A
+    ): Flag(A.n), Parent(A.n), Pattern(A.n), A_(A), Lnz(A.n) {
+      n = A_.n;
+      LAp = intvec(n+1);
       ldl_symbolic();
-      L = new sparse(LAp);
-      //L->n = n;
-      //L->Ap = std::vector<int>(n+1);
-      
-      // L->Ai = std::vector<int>(L->Ap[n]);
-      // L->Ax = std::vector<double>(L->Ap[n]);
-      D = std::vector<double>(n);
-      Y = std::vector<double>(n);
+      L = sparse(LAp);
+      L.m = n;
+      D = dblvec(n);
+      Y = dblvec(n);
+    }
+    
+    SparseChol() {};
+    
+    void update(const sparse& A){
+      Flag.resize(A.n);
+      Parent.resize(A.n);
+      Pattern.resize(A.n);
+      A_ = A;
+      Lnz.resize(A.n);
+      n = A_.n;
+      LAp = intvec(n+1);
+      ldl_symbolic();
+      L = sparse(LAp);
+      L.m = A_.n;
+      D = dblvec(n);
+      Y = dblvec(n);
     }
     
     void ldl_symbolic(){
@@ -77,10 +75,9 @@ class SparseChol{
         Parent[k] = -1 ; // parent of k is not yet known */
         Flag[k] = k ; // mark node k as visited */
         Lnz[k] = 0 ; // count of nonzeros in column k of L */
-        for (p = A_->Ap[k] ; p < A_->Ap[k+1] ; p++)
+        for (p = A_.Ap[k] ; p < A_.Ap[k+1] ; p++)
         {
-          i = A_->Ai[p];
-          //Rcpp::Rcout << "\n k:" << k << " i:" << i;
+          i = A_.Ai[p];
           if (i < k)
           {
             // follow path from i to root of etree, stop at flagged node */
@@ -104,20 +101,19 @@ class SparseChol{
     
     int ldl_numeric(){
       int p, len;
-      //Rcpp::Rcout << "\nNLoop1";
       for (int k = 0 ; k < n ; k++){
         // compute nonzero Pattern of kth row of L, in topological order */
         Y[k] = 0.0 ; // Y(0:k) is now all zero */
         int top = n ; // stack for pattern is empty */
         Flag[k] = k ; // mark node k as visited */
         Lnz[k] = 0 ; // count of nonzeros in column k of L */
-        int p2 = A_->Ap[k+1];
-        for (p = A_->Ap[k] ; p < p2 ; p++)
+        int p2 = A_.Ap[k+1];
+        for (p = A_.Ap[k] ; p < p2 ; p++)
         {
-          int i = A_->Ai[p]; // get A(i,k) */
+          int i = A_.Ai[p]; // get A(i,k) */
           if (i <= k)
           {
-            Y[i] += A_->Ax[p]; // scatter A(i,k) into Y (sum duplicates) */
+            Y[i] += A_.Ax[p]; // scatter A(i,k) into Y (sum duplicates) */
             for (len = 0 ; Flag[i] != k ; i = Parent[i])
             {
               Pattern[len++] = i ; // L(k,i) is nonzero */
@@ -134,15 +130,15 @@ class SparseChol{
           int i = Pattern[top]; // Pattern [top:n-1] is pattern of L(:,k) */
           double yi = Y[i]; // get and clear Y(i) */
           Y[i] = 0.0 ;
-          p2 = L->Ap[i] + Lnz[i] ;
-          for (p = L->Ap[i] ; p < p2 ; p++)
+          p2 = L.Ap[i] + Lnz[i] ;
+          for (p = L.Ap[i] ; p < p2 ; p++)
           {
-            Y[L->Ai[p]] -= L->Ax[p] * yi ;
+            Y[L.Ai[p]] -= L.Ax[p] * yi ;
           }
           double l_ki = yi / D[i] ; // the nonzero entry L(k,i) */
           D[k] -= l_ki * yi ;
-          L->Ai[p] = k ; // store L(k,i) in column form of L */
-          L->Ax[p] = l_ki ;
+          L.Ai[p] = k ; // store L(k,i) in column form of L */
+          L.Ax[p] = l_ki ;
           Lnz[i]++ ; // increment count of nonzeros in col i */
         }
         if (D[k] == 0.0) return(k) ; // failure, D(k,k) is zero */
@@ -154,10 +150,10 @@ class SparseChol{
       int p,p2;
       for (int j = 0 ; j < n ; j++)
       {
-        p2 = L->Ap[j+1] ;
-        for (p = L->Ap[j] ; p < p2 ; p++)
+        p2 = L.Ap[j+1] ;
+        for (p = L.Ap[j] ; p < p2 ; p++)
         {
-          x[L->Ai[p]] -= L->Ax[p] * x[j] ;
+          x[L.Ai[p]] -= L.Ax[p] * x[j] ;
         }
       }
     }
@@ -182,18 +178,23 @@ class SparseChol{
       int j, p, p2 ;
       for (j = n-1 ; j >= 0 ; j--)
       {
-        p2 = L->Ap[j+1];
-        for (p = L->Ap[j] ; p < p2 ; p++)
+        p2 = L.Ap[j+1];
+        for (p = L.Ap[j] ; p < p2 ; p++)
         {
-          x[j] -= L->Ax[p] * x[L->Ai[p]] ;
+          x[j] -= L.Ax[p] * x[L.Ai[p]] ;
         }
       }
     }
     
-    ~SparseChol(){
-      delete L;
+    sparse LD(){
+      sparse I = identity(L.n);
+      I += L;
+      I.transpose();
+      dblvec Dsq(D);
+      for(int i = 0; i < Dsq.size(); i++)Dsq[i] = sqrt(Dsq[i]);
+      I %= Dsq;
+      return I;
     }
-    
 };
 
 #endif

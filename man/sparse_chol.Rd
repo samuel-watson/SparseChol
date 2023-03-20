@@ -4,36 +4,27 @@
 \alias{sparse_chol}
 \title{Sparse Cholesky decomposition}
 \usage{
-sparse_chol(n, Ap, Ai, Ax)
+sparse_chol(mat)
 }
 \arguments{
-\item{n}{Integer specifying the dimension of the matrix}
-
-\item{Ap}{numeric (integer valued) vector of pointers, one for each column (or row), to the initial (zero-based) index of elements in the column (or row).}
-
-\item{Ai}{Integer vector specifying the row positions of the non-zero values of the matrix}
-
-\item{Ax}{values of the non-zero matrix entries}
+\item{mat}{A matrix}
 }
 \value{
-A list with elements n, Ai, Ap, Ax (corresponding to above arguments) for matrix L, and element D, which 
-contains the diagonal values of matrix D.
+A lower-triangular matrix.
 }
 \description{
 Sparse Cholesky decomposition
 }
 \details{
-Generates the LDL decomposition of a symmetrix, sparse matrix using the method 
-described by Timothy Davis (see references). Required input is a matrix
-in sparse format from the matrix package, see \link[Matrix]{sparseMatrix}
+Generates the LDL decomposition of a symmetric, sparse matrix using the method 
+described by Timothy Davis (see references). This function accepts a standard matrix,
+converts to sparse format, generates the LDL decomposition and returns the Cholesky 
+decomposition LD^0.5.
 }
 \examples{
-n <- 10
-Ap  <- c(0, 1, 2, 3, 4, 6, 7, 9, 11, 15, 19)
-Ai <- c(1, 2, 3, 4, 2,5, 6, 5,7, 5,8, 1,5,8,9, 2,5,7,10)
-Ax = c(1.7, 1., 1.5, 1.1, .02,2.6, 1.2, .16,1.3, .09,1.6,
-          .13,.52,.11,1.4, .01,.53,.56,3.1)
-out <-sparse_chol(n,Ap,Ai,Ax)
-sparse_L(out)
-sparse_D(out)
+M <- diag(10)
+#put a few random values in
+M[lower.tri(M)][seq(1,45,by=5)] <- c(0.1,0.5,0.9,0.6,0.8,0.9,0.2,0.3,0.1)
+M[upper.tri(M)][seq(1,45,by=5)] <- c(0.1,0.5,0.9,0.6,0.8,0.9,0.2,0.3,0.1)
+L <- sparse_chol(M)
 }
