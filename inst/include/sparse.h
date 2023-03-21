@@ -197,6 +197,7 @@ public:
     Ax = AB.Ax;
     Ap = AB.Ap;
     Ai = AB.Ai;
+    m = B.m;
     return *this;
   };
   // right multiplication with a diagonal matrix represented a double vector
@@ -221,9 +222,7 @@ inline dblvec operator*(const sparse& A, const dblvec& B){
   int i,j;
   for(i = 0; i < A.n; i++){
     for(j = A.Ap[i]; j < A.Ap[i+1]; j++){
-      if(B[A.Ai[j]]>0){
-        AB[i] += B[A.Ai[j]];
-      }
+      AB[i] += A.Ax[j]*B[A.Ai[j]];
     }
   }
   return AB;
