@@ -18,6 +18,7 @@ public:
   dblvec Ax;
   // initialises an empty matrix all zeroes
   sparse(int n_, int m_);
+  sparse(int n_, int m_, bool rowMajor = false);
   // this constructor uses column major formatting by default
   // change rowMajor = true for row major
   sparse(int n_, int m_, 
@@ -37,7 +38,7 @@ public:
   sparse(){};
   sparse(const sparse& sp);
   sparse& operator=(sparse B);
-  void insert(int row, int col, double x);
+  void insert(int row, int col, double x, bool rowMajor = false);
   void transpose();
   dblvec dense(bool symmetric = true);
   sparse& operator+=(const sparse& B);
@@ -46,7 +47,15 @@ public:
   sparse& operator%=(const dblvec& x);
 };
 
-inline sparse::sparse(int n_, int m_): n(n_), m(m_), Ap(m+1,0) {};
+inline sparse::sparse(int n_, int m_): n(n_), m(m_) {};
+
+inline sparse::sparse(int n_, int m_, bool rowMajor): n(n_), m(m_) {
+  if(rowMajor){
+    Ap = intvec(n+1,0);
+  } else {
+    Ap = intvec(m+1,0);
+  }
+};
 
 inline sparse::sparse(int n_, int m_, 
        const double* x,
@@ -157,26 +166,47 @@ inline sparse& sparse::operator=(sparse B){
   return *this;
 }
 
-inline void sparse::insert(int row, int col, double x){
+inline void sparse::insert(int row, int col, double x, bool rowMajor){
   // this will fail if the matrix is not initialised
-  int p = 0;
-  if(Ap[col+1] - Ap[col] > 0){
-    for(int j = Ap[col]; j < Ap[col+1]; j++){
-      if(Ai[j] < row){
-        p++;
-      } else {
-        break;
+  if(rowMajor){
+    int p = 0;
+    if(Ap[row+1] - Ap[row] > 0){
+      for(int j = Ap[row]; j < Ap[row+1]; j++){
+        if(Ai[j] < col){
+          p++;
+        } else {
+          break;
+        }
       }
     }
-  }
-  if(Ap[col]+p >= Ai.size()){
-    Ai.push_back(row);
-    Ax.push_back(x);
+    if(Ap[row]+p >= Ai.size()){
+      Ai.push_back(col);
+      Ax.push_back(x);
+    } else {
+      Ai.insert(Ai.begin()+Ap[row]+p,col);
+      Ax.insert(Ax.begin()+Ap[row]+p,x);
+    }
+    for(int i = row+1; i < Ap.size(); i++)Ap[i]++;
   } else {
-    Ai.insert(Ai.begin()+Ap[col]+p,row);
-    Ax.insert(Ax.begin()+Ap[col]+p,x);
+    int p = 0;
+    if(Ap[col+1] - Ap[col] > 0){
+      for(int j = Ap[col]; j < Ap[col+1]; j++){
+        if(Ai[j] < row){
+          p++;
+        } else {
+          break;
+        }
+      }
+    }
+    if(Ap[col]+p >= Ai.size()){
+      Ai.push_back(row);
+      Ax.push_back(x);
+    } else {
+      Ai.insert(Ai.begin()+Ap[col]+p,row);
+      Ax.insert(Ax.begin()+Ap[col]+p,x);
+    }
+    for(int i = col+1; i < Ap.size(); i++)Ap[i]++;
   }
-  for(int i = col+1; i < Ap.size(); i++)Ap[i]++;
 }
 
 inline void sparse::transpose(){
