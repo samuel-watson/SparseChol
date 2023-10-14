@@ -18,7 +18,7 @@ public:
   dblvec Ax;
   // initialises an empty matrix all zeroes
   sparse(int n_, int m_);
-  sparse(int n_, int m_, bool rowMajor = false);
+  sparse(int n_, int m_, bool rowMajor);
   // this constructor uses column major formatting by default
   // change rowMajor = true for row major
   sparse(int n_, int m_, 
