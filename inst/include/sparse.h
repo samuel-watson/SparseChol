@@ -159,7 +159,6 @@ inline sparse& sparse::operator=(sparse B){
 
 inline void sparse::insert(int row, int col, double x){
   // this will fail if the matrix is not initialised
-  for(int i = col+1; i < Ap.size(); i++)Ap[i]++;
   int p = 0;
   if(Ap[col+1] - Ap[col] > 0){
     for(int j = Ap[col]; j < Ap[col+1]; j++){
@@ -170,8 +169,14 @@ inline void sparse::insert(int row, int col, double x){
       }
     }
   }
-  Ai.insert(Ai.begin()+Ap[col]+p,row);
-  Ax.insert(Ax.begin()+Ap[col]+p,x);
+  if(Ap[col]+p >= Ai.size()){
+    Ai.push_back(row);
+    Ax.push_back(x);
+  } else {
+    Ai.insert(Ai.begin()+Ap[col]+p,row);
+    Ax.insert(Ax.begin()+Ap[col]+p,x);
+  }
+  for(int i = col+1; i < Ap.size(); i++)Ap[i]++;
 }
 
 inline void sparse::transpose(){
