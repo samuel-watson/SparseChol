@@ -1,8 +1,8 @@
 Package: SparseChol
 Type: Package
 Title: Sparse Cholesky LDL Decomposition of Symmetric Matrices
-Version: 0.2.1
-Date: 2023-03-20
+Version: 0.2.2
+Date: 2023-10-14
 Authors@R: c(person("Sam", "Watson", email = "S.I.Watson@bham.ac.uk",
                   role = c("aut","cre")),
             person("Timothy A.", "Davis", role = c("aut","ctb")))
@@ -14,7 +14,8 @@ License: GPL (>= 2)
 Imports: 
     Rcpp (>= 1.0.7)
 LinkingTo: 
-    Rcpp (>= 1.0.7)
+    Rcpp (>= 1.0.7),
+    RcppEigen
 RoxygenNote: 7.2.1
 NeedsCompilation: yes
 Author: Sam Watson [aut, cre],
