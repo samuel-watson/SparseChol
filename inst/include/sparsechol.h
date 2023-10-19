@@ -19,11 +19,11 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 Lesser General Public License for more details.
  */
+#pragma once
 
-#ifndef SPARSECHOL_H
-#define SPARSECHOL_H
 #include <cmath>
 #include "sparse.h"
+#include "operators.h"
 
 class SparseChol {
   int n;
@@ -196,5 +196,3 @@ class SparseChol {
       return I;
     }
 };
-
-#endif

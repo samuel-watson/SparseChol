@@ -48,11 +48,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// testSparse
+void testSparse();
+RcppExport SEXP _SparseChol_testSparse() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    testSparse();
+    return R_NilValue;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_SparseChol_sparse_chol_crs", (DL_FUNC) &_SparseChol_sparse_chol_crs, 4},
     {"_SparseChol_sparse_chol", (DL_FUNC) &_SparseChol_sparse_chol, 1},
     {"_SparseChol_dense_to_sparse", (DL_FUNC) &_SparseChol_dense_to_sparse, 1},
+    {"_SparseChol_testSparse", (DL_FUNC) &_SparseChol_testSparse, 0},
     {NULL, NULL, 0}
 };
 

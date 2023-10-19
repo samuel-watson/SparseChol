@@ -66,3 +66,7 @@ dense_to_sparse <- function(mat) {
     .Call(`_SparseChol_dense_to_sparse`, mat)
 }
 
+testSparse <- function() {
+    invisible(.Call(`_SparseChol_testSparse`))
+}
+
