@@ -1,12 +1,12 @@
 Package: SparseChol
 Type: Package
-Title: Sparse Cholesky LDL Decomposition of Symmetric Matrices
+Title: Sparse Matrix C++ Classes inclduing Sparse Cholesky LDL Decomposition of Symmetric Matrices
 Version: 0.2.2
-Date: 2023-10-14
+Date: 2023-10-20
 Authors@R: c(person("Sam", "Watson", email = "S.I.Watson@bham.ac.uk",
                   role = c("aut","cre")),
             person("Timothy A.", "Davis", role = c("aut","ctb")))
-Description: 'C++' implementation of sparse LDL decomposition of symmetric matrices and solvers described by Timothy A. Davis (2016) 
+Description: 'C++' classes for sparse matrix methods including implementation of sparse LDL decomposition of symmetric matrices and solvers described by Timothy A. Davis (2016) 
   <https://fossies.org/linux/SuiteSparse/LDL/Doc/ldl_userguide.pdf>. Provides a set of C++ classes for basic sparse
   matrix specification and linear algebra, and a class to implement sparse LDL decomposition and solvers. See <https://github.com/samuel-watson/SparseChol>
   for details.
@@ -16,7 +16,7 @@ Imports:
 LinkingTo: 
     Rcpp (>= 1.0.7),
     RcppEigen
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 NeedsCompilation: yes
 Author: Sam Watson [aut, cre],
           Timothy A. Davis [aut, ctb]

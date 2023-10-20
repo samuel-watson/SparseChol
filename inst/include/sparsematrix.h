@@ -173,29 +173,38 @@ inline sparse& sparse::operator=(sparse B){
 
 inline double sparse::operator()(const int row, const int col){
   bool found = false;
+  int i;
   if(rowMajor){
-    for(int i = Ap[row]; i < Ap[row+1]; i++){
+    for(i = Ap[row]; i < Ap[row+1]; i++){
       if(Ai[i] == col){
         found = true;
-        return Ax[i];
         break;
       }
     }
-    if(!found)return 0;
+    if(!found){
+      return 0;
+    } else {
+      return Ax[i];
+    }
   } else {
-    for(int i = Ap[col]; i < Ap[col+1]; i++){
+    for(i = Ap[col]; i < Ap[col+1]; i++){
       if(Ai[i] == row){
         found = true;
-        return Ax[i];
+        
         break;
       }
     }
-    if(!found)return 0;
+    if(!found){
+      return 0;
+    } else {
+      return Ax[i];
+    }
   }
 }
 
 inline void sparse::insert(int row, int col, double x){
   // this will fail if the matrix is not initialised
+  if(Ap.size()==0)Rcpp::stop("Matrix not properly initialised");
   if(rowMajor){
     int p = 0;
     if(Ap[row+1] - Ap[row] > 0){
