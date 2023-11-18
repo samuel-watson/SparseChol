@@ -1,4 +1,4 @@
-#include "sparse.h"
+#include "SparseChol.h"
 
 // This is a quick test of the sparse class
 // Will add more tests and automatic running
