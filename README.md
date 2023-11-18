@@ -1,10 +1,67 @@
 # SparseChol
 
-A c++ implementation of the approach to sparse, symmetric matrix LDL decomposition described by Timothy Davis (https://fossies.org/linux/SuiteSparse/LDL/Doc/ldl_userguide.pdf).
-The header file in /inst/include/sparsechol.h defines the class SparseChol, which can be implemented in other c++ applications for R with Rcpp. The R function
-`sparse_chol()` provides an R interface using compressed column form as per the `CsparseMatrix` in the Matrix package.
+The package originally started as just a header library to implement the sparse, symmetric matrix LDL decomposition algorithm described by Timothy Davis (https://fossies.org/linux/SuiteSparse/LDL/Doc/ldl_userguide.pdf), but now also includes a growing sparse matrix class that is compataible with the Eigen library. 
+Sparse matrices are possible in Eigen, but hard to work with and lacks LDL decomposition, so this package is meant to provide a simple interface with relatively 
+efficient functionality. However, these functions will be optimised in future versions. We use the sparse functionality in the [glmmrBase](https://github.com/samuel-watson/glmmrBase/tree/master) and associated packages to store and use, for example, sparse design and covariance matrices.
 
-## An example in R
+The header file in /inst/include/sparse.h imports the classes for the library and can be included in other projects using Rcpp in R. 
+The R function `sparse_chol()` provides an R interface using compressed column form as per the `CsparseMatrix` in the Matrix package.
+
+## C++ API
+### Sparse matrix class
+The sparse matrix class `sparse` can be initialised in several ways including from an `Rcpp::NumericMatrix` and an `Eigen::MatrixXd`. It is effectively a container for 
+a sparse matrix representation of the matrix. It can also just be initialised by specifying the rows and columns and later inserting elements. For example,
+```
+#include <sparse.h>
+#include <RcppEigen.h> //assuming this is for an R package
+
+// to create a 4x3 matrix, stored in row major order
+sparse A(4,3,true);
+A.insert(0,0,1);
+A.insert(0,2,2);
+A.insert(1,1,1);
+A.insert(2,1,3);
+A.insert(3,0,2);
+A.insert(3,2,3);
+
+// generate an Eigen matrix
+MatrixXd B(3,3);
+  for(int i = 0; i < 3; i++){
+    for(int j = 0; j < 3; j++){
+      B(i,j) = i + 1 + j*3;
+    }
+  }
+
+MatrixXd AB = A * B; // multiply sparse by sparse
+
+// generate a transpose of the matrix
+sparse At = A;
+At.transpose();
+// and multiply
+At *= A;
+```
+
+### Sparse LDL decomposition
+The `SparseChol` class is responsible for the sparse LDL decomposition. We initialise the class using a `sparse` matrix.
+```
+#include <sparse.h>
+
+SparseChol sp(mat); // where mat is of class sparse
+int d = sp.ldl_numeric(); // run decomposition, returns dimension of matrix if success
+//to retrieve the Cholesky decomposion LD^0.5
+sparse LD = sp.LD();
+// or we can return L and D separately
+
+// to solve the linear system Ax = v where v is a std::vector<double> we pass a reference to the first element of the vector
+// the system is solved in place so that v will contain the result
+spchol.ldl_lsolve(&v[0]); // Lx = v
+spchol.ldl_d2solve(&v[0]); // Dx = v
+
+```
+
+## R functions
+We can use the LDL decomposition in R with the associated functions provided for demonstration. 
+
 ```
 > n <- 10
 > Ap  <- c(0, 1, 2, 3, 4, 6, 7, 9, 11, 15, ANZ)
@@ -54,23 +111,4 @@ The header file in /inst/include/sparsechol.h defines the class SparseChol, whic
 [10,]    .    .    .    .      .    .        .       .        . 2.769568
 ```
 
-## An example in C++
-```
-#include <sparsechol.h>
-main(){
-  sparse mat;
-  mat.n = 19;
-  mat.Ap = {0, 1, 2, 3, 4, 6, 7, 9, 11, 15, ANZ};
-  mat.Ai = {0, 1, 2, 3, 1,4, 5, 4,6, 4,7, 0,4,7,8, 1,4,6,9 };
-  mat.Ax = {1.7, 1., 1.5, 1.1, .02,2.6, 1.2, .16,1.3, .09,1.6,
-            .13,.52,.11,1.4, .01,.53,.56,3.1};
-  SparseChol chol(&mat);
-  int d = chol.ldl_numeric();
-  //print off-diagonal values of matrix L, for example
-   for (auto& k : chol.L->Ax)
-     cout << k << " ";
-}
-```
 
-## Solvers
-Also included in the `SparseChol` class are LDL solvers for $Lx=y$ and $Dx=y$
