@@ -2,45 +2,6 @@
 
 #include "sparsematrix.h"
 
-using namespace Eigen;
-
-inline MatrixXd sparse_to_dense(const sparse& m,
-                                bool symmetric = true,
-                                bool rowmajor = true){
-  MatrixXd D = MatrixXd::Zero(m.n,m.m);
-  if(rowmajor){
-    for(int i = 0; i < m.n; i++){
-      for(int j = m.Ap[i]; j < m.Ap[i+1]; j++){
-        D(i,m.Ai[j]) = m.Ax[j];
-        if(symmetric) D(m.Ai[j],i) = m.Ax[j];
-      }
-    }
-  } else {
-    for(int i = 0; i < m.m; i++){
-      for(int j = m.Ap[i]; j < m.Ap[i+1]; j++){
-        D(m.Ai[j],i) = m.Ax[j];
-        if(symmetric) D(m.Ai[j],i) = m.Ax[j];
-      }
-    }
-  }
-  
-  return D;
-}
-
-inline sparse dense_to_sparse(const MatrixXd& A,
-                              bool symmetric = true){
-  sparse As(A.rows(),A.cols(),A.data(),true); // this doesn't account for symmetric yet
-  return As;
-}
-
-// right multiplication with a diagonal matrix represented a double vector
-inline sparse& sparse::operator%=(const dblvec& x){
-  for(int i = 0; i < Ax.size(); i++){
-    Ax[i] *= x[Ai[i]];
-  }
-  return *this;
-}
-
 // some operators
 inline sparse operator*(sparse A, const sparse& B){
   A *= B;
@@ -71,6 +32,14 @@ inline sparse operator+(sparse A, const sparse& B){
   return A;
 }
 
+// right multiplication with a diagonal matrix represented a double vector
+inline sparse& sparse::operator%=(const dblvec& x){
+  for(int i = 0; i < Ax.size(); i++){
+    Ax[i] *= x[Ai[i]];
+  }
+  return *this;
+}
+
 inline sparse identity(int n){
   sparse A(n,n);
   intvec ones(n);
@@ -80,6 +49,43 @@ inline sparse identity(int n){
   A.Ai = ones;
   A.Ax = dblvec(n,1);
   return A;
+}
+
+// had to wrap some of these in a namespace to prevent problems with
+// reverse compatibility on CRAN where the functions are defined in glmmrBase v0.4.6
+// I can't submit both at once as they have to both be compared to one another.
+// Will remove this namespace once glmmrBase is updated.
+namespace SparseOperators {
+
+using namespace Eigen;
+
+inline MatrixXd sparse_to_dense(const sparse& m,
+                                bool symmetric = true,
+                                bool rowmajor = true){
+  MatrixXd D = MatrixXd::Zero(m.n,m.m);
+  if(rowmajor){
+    for(int i = 0; i < m.n; i++){
+      for(int j = m.Ap[i]; j < m.Ap[i+1]; j++){
+        D(i,m.Ai[j]) = m.Ax[j];
+        if(symmetric) D(m.Ai[j],i) = m.Ax[j];
+      }
+    }
+  } else {
+    for(int i = 0; i < m.m; i++){
+      for(int j = m.Ap[i]; j < m.Ap[i+1]; j++){
+        D(m.Ai[j],i) = m.Ax[j];
+        if(symmetric) D(m.Ai[j],i) = m.Ax[j];
+      }
+    }
+  }
+  
+  return D;
+}
+
+inline sparse dense_to_sparse(const MatrixXd& A,
+                              bool symmetric = true){
+  sparse As(A.rows(),A.cols(),A.data(),true); // this doesn't account for symmetric yet
+  return As;
 }
 
 template<typename Derived>
@@ -174,4 +180,4 @@ inline sparse operator%(const sparse& A, const VectorXd& x){
   return Ax;
 }
 
-
+}

@@ -4,6 +4,7 @@
 // Will add more tests and automatic running
 // [[Rcpp::export]]
 void testSparse(){
+  using namespace SparseOperators;
   sparse A(4,3,true);
   A.insert(0,0,1);
   A.insert(0,2,2);
