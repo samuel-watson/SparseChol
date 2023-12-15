@@ -88,6 +88,7 @@ struct AMDInfo{
 
 class sparse {
   friend class SparseChol;
+  
 public:
   int n; //rows
   int m; //cols
@@ -126,7 +127,7 @@ public:
   sparse& operator%=(const dblvec& x);
   void calculate_amd_permute();
   intvec permute();
-  intvec permute_inv();
+  intvec permute_inv(); 
 protected:
   intvec P;
   intvec Pinv;
@@ -261,7 +262,8 @@ inline sparse::sparse(std::vector<int> p): Ap(p) {
   Ax = std::vector<double>(Ap[n]);
 };
 
-inline sparse::sparse(const sparse& sp) : n(sp.n), m(sp.m), Ap(sp.Ap), Ai(sp.Ai), Ax(sp.Ax), rowMajor(sp.rowMajor) {};
+inline sparse::sparse(const sparse& sp) : n(sp.n), m(sp.m), Ap(sp.Ap), Ai(sp.Ai), Ax(sp.Ax),
+  P(sp.P), Pinv(sp.Pinv), use_permuted(sp.use_permuted), rowMajor(sp.rowMajor) {};
 
 inline sparse& sparse::operator=(sparse B){
   n = B.n;

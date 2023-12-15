@@ -80,16 +80,16 @@ SEXP sparse_chol(Rcpp::NumericMatrix mat){
 }
 
 //' AMD ordering
- //'
- //' AMD ordering
- //'
- //' @details
- //' Generates the approximate minimum degree ordering of the matrix for use in efficient
- //' Cholesky decomposition of PAP^T.
- //' @param mat A matrix
- //' @return A list with the permutation vector and it's inverse.
- // [[Rcpp::export]]
- SEXP amd_order(Rcpp::NumericMatrix mat){
+//'
+//' AMD ordering
+//'
+//' @details
+//' Generates the approximate minimum degree ordering of the matrix for use in efficient
+//' Cholesky decomposition of PAP^T.
+//' @param mat A matrix
+//' @return A list with the permutation vector and it's inverse.
+// [[Rcpp::export]]
+SEXP amd_order(Rcpp::NumericMatrix mat){
    int n = mat.rows();
    int m = mat.cols();
    if(m!=n)Rcpp::stop("Matrix must be square");
@@ -100,7 +100,7 @@ SEXP sparse_chol(Rcpp::NumericMatrix mat){
      _["P"] = P,
      _["Pinv"] = Pinv
    ));
- }
+}
 
 //' Generate sparse matrix representation of a matrix
 //' 
