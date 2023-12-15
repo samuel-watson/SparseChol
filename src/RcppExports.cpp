@@ -37,6 +37,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// amd_order
+SEXP amd_order(Rcpp::NumericMatrix mat);
+RcppExport SEXP _SparseChol_amd_order(SEXP matSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type mat(matSEXP);
+    rcpp_result_gen = Rcpp::wrap(amd_order(mat));
+    return rcpp_result_gen;
+END_RCPP
+}
 // dense_to_sparse
 Rcpp::List dense_to_sparse(Rcpp::NumericMatrix mat);
 RcppExport SEXP _SparseChol_dense_to_sparse(SEXP matSEXP) {
@@ -61,6 +72,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_SparseChol_sparse_chol_crs", (DL_FUNC) &_SparseChol_sparse_chol_crs, 4},
     {"_SparseChol_sparse_chol", (DL_FUNC) &_SparseChol_sparse_chol, 1},
+    {"_SparseChol_amd_order", (DL_FUNC) &_SparseChol_amd_order, 1},
     {"_SparseChol_dense_to_sparse", (DL_FUNC) &_SparseChol_dense_to_sparse, 1},
     {"_SparseChol_testSparse", (DL_FUNC) &_SparseChol_testSparse, 0},
     {NULL, NULL, 0}
