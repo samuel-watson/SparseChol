@@ -2,7 +2,7 @@ Package: SparseChol
 Type: Package
 Title: Sparse Matrix C++ Classes Including Sparse Cholesky LDL Decomposition of Symmetric Matrices
 Version: 0.3.1
-Date: 2023-11-19
+Date: 2023-12-15
 Authors@R: c(person("Sam", "Watson", email = "S.I.Watson@bham.ac.uk",
                   role = c("aut","cre")),
             person("Timothy A.", "Davis", role = c("aut","ctb")))

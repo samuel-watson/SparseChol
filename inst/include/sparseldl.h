@@ -32,7 +32,7 @@ class SparseChol {
   intvec Pattern;
   intvec LAp;
   public:
-    sparse A_;
+    sparse A_; // matrix to factorise
     sparse L;
     intvec Lnz;
     dblvec D;
@@ -194,10 +194,23 @@ class SparseChol {
       I += L;
       I.transpose();
       dblvec Dsq(D);
-      for(int i = 0; i < Dsq.size(); i++)Dsq[i] = sqrt(Dsq[i]);
+      for(auto& d: Dsq) d = sqrt(d);
       I %= Dsq;
       I.n = L.n;
       I.m = L.m;
       return I;
+    }
+    
+    
+    // variant to modify in place
+    void LD(sparse& mat){
+      mat = identity(L.n);
+      mat += L;
+      mat.transpose();
+      dblvec Dsq(D);
+      for(auto& d: Dsq) d = sqrt(d);
+      mat %= Dsq;
+      mat.n = L.n;
+      mat.m = L.m;
     }
 };

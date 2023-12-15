@@ -269,6 +269,9 @@ inline sparse& sparse::operator=(sparse B){
   Ap.swap(B.Ap);
   Ai.swap(B.Ai);
   Ax.swap(B.Ax);
+  P.swap(B.P);
+  Pinv.swap(B.Pinv);
+  use_permuted = B.use_permuted;
   rowMajor = B.rowMajor;
   return *this;
 }
