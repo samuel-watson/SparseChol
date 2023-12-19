@@ -76,7 +76,7 @@ class SparseChol {
         Flag[k] = k ; // mark node k as visited */
         Lnz[k] = 0 ; // count of nonzeros in column k of L */
 #ifdef ENABLE_DEBUG
-      Rcpp::Rcout "\nLDL Symbolic. Permuted: " << A_.use_permuted;  
+      Rcpp::Rcout <<  "\nLDL Symbolic. Permuted: " << A_.use_permuted;  
 #endif
         kk = A_.use_permuted ? A_.P[k] : k;
         p2 = A_.Ap[kk+1];
