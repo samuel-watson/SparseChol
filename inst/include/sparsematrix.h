@@ -46,12 +46,12 @@ DAMAGE.
 #define EMPTY (-1)
 #define FLIP(i) (-(i)-2)
 #define UNFLIP(i) ((i < EMPTY) ? FLIP (i) : (i))
-// #define ENABLE_DEBUG
+// #define ENABLE_DEBUG_SCHOL
 
 typedef std::vector<int> intvec;
 typedef std::vector<double> dblvec;
 
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
 inline void CHECK_INDEX(int idx, intvec& vec, int ERR = 0){
   if(idx > vec.size()-1){
     Rcpp::Rcout << "\nERROR: " << ERR;
@@ -132,10 +132,11 @@ protected:
   intvec P;
   intvec Pinv;
   AMDInfo info;
+  bool use_permuted = false;
+  
   void AMD_aat(intvec& Len, intvec& Tp);
   int AMD_post_tree(int root, int k_in, intvec& Child, const intvec& Sibling, intvec& Order, intvec& Stack);
   void AMD_order();
-  bool use_permuted = false;
   
 };
 
@@ -263,7 +264,7 @@ inline sparse::sparse(std::vector<int> p): Ap(p) {
 };
 
 inline sparse::sparse(const sparse& sp) : n(sp.n), m(sp.m), Ap(sp.Ap), Ai(sp.Ai), Ax(sp.Ax),
-  P(sp.P), Pinv(sp.Pinv), use_permuted(sp.use_permuted), rowMajor(sp.rowMajor) {};
+  rowMajor(sp.rowMajor), P(sp.P), Pinv(sp.Pinv), use_permuted(sp.use_permuted) {};
 
 inline sparse& sparse::operator=(sparse B){
   n = B.n;
@@ -511,14 +512,14 @@ inline void sparse::AMD_aat(intvec& Len, intvec& Tp)
       {
         break ;
       }
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(j+1,Ap,464);
       CHECK_INDEX(j+1,Tp,465);
 #endif
       pj2 = Ap[j+1] ;
       for (pj = Tp[j] ; pj < pj2 ; )
       {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         CHECK_INDEX(pj,Ai,471);
 #endif
         int i = Ai [pj] ;
@@ -539,12 +540,12 @@ inline void sparse::AMD_aat(intvec& Len, intvec& Tp)
           break ;
         }
       }
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(j,Tp,492);
 #endif
       Tp[j] = pj ;
     }
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
     CHECK_INDEX(k,Tp,497);
 #endif
     Tp[k] = p ;
@@ -553,7 +554,7 @@ inline void sparse::AMD_aat(intvec& Len, intvec& Tp)
   {
     for (pj = Tp[j] ; pj < Ap[j+1] ; pj++)
     {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(pj,Ai,490);
 #endif
       int i = Ai [pj] ;
@@ -592,11 +593,11 @@ inline int sparse::AMD_post_tree(int root,
   Stack[0] = root;
   while (head >= 0)
   {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
     CHECK_INDEX(head,Stack,545);
 #endif
     int i = Stack[head];
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
     CHECK_INDEX(i,Child,549);
 #endif
     if (Child[i] != EMPTY)
@@ -609,7 +610,7 @@ inline int sparse::AMD_post_tree(int root,
     else
     {
       head--;
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(i,Order,562);
 #endif
       Order[i] = k++;
@@ -639,7 +640,7 @@ inline void sparse::AMD_order()
   std::fill(P.begin(), P.end(), 0.0);
   std::fill(Pinv.begin(), Pinv.end(), 0.0);
   info.n = nn;
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
   Rcpp::Rcout << "\nSTART AAT";
 #endif
   AMD_aat (Len, P);
@@ -648,7 +649,7 @@ inline void sparse::AMD_order()
   for (int i = 0 ; i < 7 ; i++)slen += nn ;
   int iwlen = slen - 6*nn;
   
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
     Rcpp::Rcout << "\nSlen: " << slen << " iwlen: " << iwlen;
 #endif
     
@@ -661,13 +662,13 @@ inline void sparse::AMD_order()
     Nv[j] = pfree ;
     pfree += Len[j] ;
   }
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
   Rcpp::Rcout << "\nLoop 1, pfree: " << pfree;
 #endif
 
   for (int k = 0 ; k < nn; k++)
   {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
     Rcpp::Rcout << "\nConstruct row/column k=" << k << " of A+A";
     CHECK_INDEX(k+1,Ap,619);
 #endif
@@ -676,16 +677,16 @@ inline void sparse::AMD_order()
     int p;
     for (p = p1 ; p < p2 ; )
     {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(p,Ai,627);
 #endif
       int j = Ai[p] ;
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(j,Nv,632);
 #endif
       if (j < k)
       {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         CHECK_INDEX(Nv[j],Iw,634);
         CHECK_INDEX(Nv[k],Iw,635);
 #endif
@@ -702,7 +703,7 @@ inline void sparse::AMD_order()
       {
         break ;
       }
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(j+1,Ap,651);
       if(Ap[j] > Tp[j] || Tp[j] > Ap[j+1])Rcpp::stop("Error 655 ASSERTION");
 #endif
@@ -710,13 +711,13 @@ inline void sparse::AMD_order()
       int pj;
       for (pj = Tp[j] ; pj < pj2 ; )
       {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         CHECK_INDEX(pj,Ai,658);
 #endif
         int i = Ai[pj] ;
         if (i < k)
         {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           CHECK_INDEX(j,Nv,664);
           CHECK_INDEX(Nv[j],Iw,665);
           CHECK_INDEX(Nv[i],Iw,667);
@@ -735,18 +736,18 @@ inline void sparse::AMD_order()
           break ;
         }
       }
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(j,Tp,683);
 #endif
       Tp[j] = pj;
     }
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
     CHECK_INDEX(k,Tp,688);
 #endif
     Tp[k] = p;
   }
   
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
   Rcpp::Rcout << "\nLoop 2, Tp: ";
   for(const auto& t: Tp) Rcpp::Rcout << t << " ";
 #endif
@@ -755,19 +756,19 @@ inline void sparse::AMD_order()
   {
     for (int pj = Tp[j] ; pj < Ap[j+1] ; pj++)
     {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(pj,Ai,703);
       CHECK_INDEX(Nv[j],Iw,704);
 #endif
       int i = Ai[pj];
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(Nv[i],Iw,708);
 #endif
       Iw[Nv[i]++] = j ;
       Iw[Nv[j]++] = i ;
     }
   }
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
   for (int j = 0 ; j < nn-1 ; j++){
     if(Nv[j]!=Pe[j+1])Rcpp::stop("Error 720 ASSERTION");
   }
@@ -793,7 +794,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
   dense = dense > 16 ? dense : 16.0;
   dense = dense < nn ? dense : nn;
   
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
   Rcpp::Rcout << "\nInitialise output statistics, dense: " << dense;
 #endif
 
@@ -825,7 +826,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
     }
     else if (deg > dense)
     {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       Rcpp::Rcout << "\nDense node " << i << " degree " << deg;
 #endif
       info.ndense++ ;
@@ -837,11 +838,11 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
     else
     {
       inext = Head[deg];
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(deg,Head,776);
 #endif
       if(inext != EMPTY) {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         CHECK_INDEX(inext,P,780);
 #endif
         P[inext] = i;
@@ -851,7 +852,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
     }
   }
   
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
   Rcpp::Rcout << "\nLoop 4, nel: " << nel << " ndense: " << info.ndense;
 #endif
 
@@ -859,7 +860,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
   {
     for (deg = mindeg ; deg < n ; deg++)
     {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(deg,Head,795);
 #endif
       me = Head[deg];
@@ -869,7 +870,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
     inext = Pinv[me];
     if(inext != EMPTY) P[inext] = EMPTY;
     
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
     CHECK_INDEX(deg,Head,805);
     CHECK_INDEX(me,Elen,806);
 #endif
@@ -877,7 +878,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
     Head[deg] = inext;
     int elenme = Elen[me];
     int nvpiv = Nv[me];
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
     if(nvpiv <= 0)Rcpp::stop("830 nvpiv <= 0");
 #endif
     nel += nvpiv;
@@ -891,12 +892,12 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
       pme2 = pme1 - 1;
       for (int p = pme1 ; p <= pme1 + Len[me] - 1; p++)
       {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         CHECK_INDEX(p,Iw,824);
 #endif
         int i = Iw[p];
         
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         CHECK_INDEX(i,Nv,829);
         CHECK_INDEX(ilast,Pinv,831);
 #endif
@@ -910,7 +911,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
           int ilast = P[i];
           int inext = Pinv[i];
           if (inext != EMPTY) {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
             CHECK_INDEX(inext,P,847);
 #endif
             P[inext] = ilast;
@@ -921,7 +922,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
           }
           else
           {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
             CHECK_INDEX(Degree[i],Head,850);
 #endif
             Head[Degree[i]] = inext;
@@ -931,7 +932,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
     }
     else
     {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(me,Pe,860);
 #endif
       int p = Pe[me];
@@ -945,22 +946,22 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
           e = me ;
           pj = p ;
           ln = slenme ;
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           Rcpp::Rcout << "\nSearch sv: " << me << " " << pj << " " << ln;
 #endif
         }
         else
         {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           CHECK_INDEX(p,Iw,877);
 #endif
           e = Iw [p++];
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           CHECK_INDEX(e,Pe,878);
 #endif
           pj = Pe [e];
           ln = Len [e];
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           Rcpp::Rcout << "Search element e " << e << " in me " << me;
           if(Elen[e] >= EMPTY)Rcpp::stop("914 Elen-e > empty");
           if(Tp[e] <= 0)Rcpp::stop("914 W-e < 0");
@@ -968,28 +969,28 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
 #endif
         }
         
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         if(ln < 0) Rcpp::stop("921 ln < 0");
 #endif 
         
         for (int knt2 = 1 ; knt2 <= ln ; knt2++)
         {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           CHECK_INDEX(pj,Iw,887);
 #endif
           int i = Iw[pj++];
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           CHECK_INDEX(i,Nv,888);
 #endif
           int nvi = Nv [i] ;
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           Rcpp::Rcout << "\nVars i " << i << " elen[i] " << Elen[i] << " Nv[i] " << Nv[i] << " wflg " << wflg;
 #endif
           if (nvi > 0)
           {
             if (pfree >= iwlen)
             {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
               Rcpp::Rcout << "\nGARBAGE COLLECTION";
               CHECK_INDEX(me,Pe,899);
               CHECK_INDEX(e,Pe,900);
@@ -1006,7 +1007,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
                 int pn = Pe [j];
                 if (pn >= 0)
                 {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
                   CHECK_INDEX(j,Pe,915);
                   CHECK_INDEX(pn,Iw,916);
 #endif
@@ -1020,13 +1021,13 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
 
               while (psrc <= pend)
               {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
                 CHECK_INDEX(psrc,Iw,929);
 #endif
                 int j = FLIP(Iw[psrc++]);
                 if (j >= 0)
                 {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
                   CHECK_INDEX(pdst,Iw,935);
                   CHECK_INDEX(j,Pe,936);
 #endif
@@ -1035,7 +1036,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
                   int lenj = Len[j];
                   for (int knt3 = 0 ; knt3 <= lenj - 2 ; knt3++)
                   {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
                     CHECK_INDEX(pdst,Iw,944);
                     CHECK_INDEX(psrc,Iw,945);
 #endif
@@ -1050,7 +1051,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
               }
               pme1 = p1 ;
               pfree = pdst ;
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
               CHECK_INDEX(me,Pe,959);
               CHECK_INDEX(e,Pe,960);
 #endif
@@ -1059,35 +1060,35 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
 
             }
             degme += nvi;
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
             CHECK_INDEX(i,Nv,968);
             CHECK_INDEX(pfree,Iw,969);
 #endif
             Nv[i] = -nvi;
             Iw[pfree++] = i;
             
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
             Rcpp::Rcout << "\nVars i " << i << " nv " << Nv[i];
 #endif
             
             int ilast = P[i];
             int inext = Pinv[i];
             if (inext != EMPTY) {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
               CHECK_INDEX(inext,Iw,970);
 #endif
               P[inext] = ilast;
             }
             if (ilast != EMPTY)
             {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
               CHECK_INDEX(ilast,Pinv,981);
 #endif
               Pinv[ilast] = inext;
             }
             else
             {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
               CHECK_INDEX(Degree[i],Head,988);
 #endif
               Head[Degree[i]] = inext;
@@ -1096,7 +1097,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
         }
         if (e != me)
         {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           CHECK_INDEX(e,Pe,997);
           Rcpp::Rcout << "\nELEMENT " << e << " => " << me;
 #endif
@@ -1107,7 +1108,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
       pme2 = pfree - 1;
     }
     
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
     CHECK_INDEX(me,Pe,1006);
 #endif
     Degree[me] = degme;
@@ -1115,7 +1116,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
     Len[me] = pme2 - pme1 + 1;
     Elen[me] = FLIP(nvpiv + degme);
     
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
     Rcpp::Rcout << "\nNew element structure: length = " << pme2-pme1+1 << "\n";
     for (int pme = pme1 ; pme <= pme2 ; pme++) Rcpp::Rcout << " " << Iw[pme];
     Rcpp::Rcout << "\nme: ";
@@ -1125,16 +1126,16 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
 
     for (int pme = pme1 ; pme <= pme2 ; pme++)
     {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(pme,Iw,1017);
 #endif
       int i = Iw[pme];
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(i,Elen,1021);
 #endif
       int eln = Elen[i];
       
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       Rcpp::Rcout << "\ni " << i << " Elen " << eln;
 #endif
       
@@ -1144,32 +1145,32 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
         int wnvi = wflg - nvi;
         for (int p = Pe[i] ; p <= Pe[i] + eln - 1 ; p++)
         {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           CHECK_INDEX(p,Iw,1031);
 #endif
           int e = Iw[p];
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           CHECK_INDEX(e,Tp,1035);
 #endif
           int we = Tp[e];
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           Rcpp::Rcout << "\nVars e " << e << " we " << we;
 #endif
           if (we >= wflg)
           {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
             Rcpp::Rcout << "  Unabsorbed, first time seen ";
 #endif
             we -= nvi ;
           }
           else if (we != 0)
           {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
             Rcpp::Rcout << "  Unabsorbed ";
 #endif
             we = Degree [e] + wnvi ;
           }
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           Rcpp::Rcout << "\n ";
 #endif
           Tp[e] = we;
@@ -1179,11 +1180,11 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
 
     for (int pme = pme1 ; pme <= pme2 ; pme++)
     {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(pme,Iw,1054);
 #endif
       int i = Iw[pme];
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(i,Pe,1058);
       Rcpp::Rcout << "\nUpdating: i " << i << " elen " << Elen[i] << " len " << Len[i];
 #endif
@@ -1196,11 +1197,11 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
       {
         for (int p = p1 ; p <= p2 ; p++)
         {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           CHECK_INDEX(p,Iw,1070);
 #endif
           int e = Iw[p];
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           CHECK_INDEX(e,Tp,1074);
 #endif
           int we = Tp[e];
@@ -1209,19 +1210,19 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
             int dext = we - wflg ;
             if (dext > 0)
             {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
               CHECK_INDEX(pn,Iw,1083);
 #endif
               deg += dext;
               Iw[pn++] = e;
               hash += e;
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
               Rcpp::Rcout << "\ne: " << e << " hash = " << hash;
 #endif
             }
             else
             {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
               Rcpp::Rcout << "\nElement " << e << " => " << me << " (aggressive)";
               if(dext != 0)Rcpp::stop("1175 dext != 0");
 #endif
@@ -1235,30 +1236,30 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
       {
         for (int p = p1 ; p <= p2 ; p++)
         {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           CHECK_INDEX(p,Iw,1102);
 #endif
           int e = Iw[p];
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           CHECK_INDEX(e,Tp,1106);
 #endif
           int we = Tp[e] ;
           if (we != 0)
           {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
             CHECK_INDEX(pn,Iw,1112);
 #endif
             int dext = we - wflg ;
             deg += dext ;
             Iw[pn++] = e;
             hash += e;
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
             Rcpp::Rcout << "\ne: " << e << " hash = " << hash;
 #endif
           }
         }
       }
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(i,Elen,1122);
 #endif
       Elen[i] = pn - p1 + 1 ;
@@ -1266,23 +1267,23 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
       int p4 = p1 + Len[i];
       for (int p = p2 + 1 ; p < p4 ; p++)
       {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         CHECK_INDEX(p,Iw,1130);
 #endif
         int j = Iw[p];
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         CHECK_INDEX(j,Nv,1134);
 #endif
         int nvj = Nv[j];
         if (nvj > 0)
         {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           CHECK_INDEX(pn,Iw,1140);
 #endif
           deg += nvj;
           Iw[pn++] = j;
           hash += j;
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           Rcpp::Rcout << "\nVars: s: " << j << " hash " << hash << " Nv[j] " << nvj;
 #endif
         }
@@ -1290,7 +1291,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
 
       if (Elen[i] == 1 && p3 == pn)
       {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         Rcpp::Rcout << "\nMASS i "<< i << " => parent e " << me;
 #endif
         Pe[i] = FLIP(me);
@@ -1304,7 +1305,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
       }
       else
       {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         CHECK_INDEX(pn,Iw,1162);
         CHECK_INDEX(p3,Iw,1163);
         CHECK_INDEX(p1,Iw,1164);
@@ -1315,7 +1316,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
         Iw[p1] = me;
         Len[i] = pn - p1 + 1;
         hash = hash % n;
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         CHECK_INDEX(hash,Head,1173);
 #endif
         int j = Head[hash];
@@ -1326,19 +1327,19 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
         }
         else
         {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           CHECK_INDEX(j,P,1184);
 #endif
           Pinv[i] = P[j];
           P[j] = i;
         }
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         CHECK_INDEX(i,P,1190);
 #endif
         P[i] = hash;
       }
     }
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
     CHECK_INDEX(me,Degree,1196);
 #endif
     Degree[me] = degme;
@@ -1346,24 +1347,24 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
     wflg += lemax ;
     wflg = clear_flag (wflg, wbig, Tp) ;
     
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
     Rcpp::Rcout << "\nSupervariable detection:";
 #endif 
     
     for (int pme = pme1 ; pme <= pme2 ; pme++)
     {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(pme,Iw,1205);
 #endif
       int i = Iw[pme];
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(i,Nv,1209);
       Rcpp::Rcout << "\nConsider i "<< i << " nv " << Nv[i];
 #endif
       if (Nv[i] < 0)
       {
         hash = P[i];
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         CHECK_INDEX(hash,Head,1215);
 #endif
         int j = Head[hash];
@@ -1378,20 +1379,20 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
         }
         else
         {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           CHECK_INDEX(j,P,1230);
 #endif
           i = P[j];
           P[j] = EMPTY;
         }
         
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         Rcpp::Rcout << "\n----i " << i << " hash " << hash;
 #endif  
         
         while (i != EMPTY && Pinv[i] != EMPTY)
         {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           CHECK_INDEX(i, Len,1238);
           Rcpp::Rcout << "\ncompare i " << i << " and j " << j;
 #endif
@@ -1399,7 +1400,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
           int eln = Elen [i] ;
           for (int p = Pe [i] + 1 ; p <= Pe [i] + ln - 1 ; p++)
           {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
             CHECK_INDEX(Iw[p],Tp,1245);
 #endif
             Tp[Iw[p]] = wflg;
@@ -1408,14 +1409,14 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
           j = Pinv [i] ;
           while (j != EMPTY)
           {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
             CHECK_INDEX(j,Len,1254);
 #endif
             int ok = (Len [j] == ln) && (Elen [j] == eln) ;
             for (int p = Pe [j] + 1 ; ok && p <= Pe [j] + ln - 1 ; p++)if (Tp[Iw[p]] != wflg) ok = 0;
             if (ok)
             {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
               CHECK_INDEX(j,Pe,1261);
               CHECK_INDEX(i,Nv,1262);
               CHECK_INDEX(jlast,Pinv,1263);
@@ -1434,7 +1435,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
               j = Pinv [j] ;
             }
           }
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           CHECK_INDEX(i,Pinv,1279);
 #endif
           wflg++ ;
@@ -1443,7 +1444,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
       }
     }
     
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
     Rcpp::Rcout << "\nDetect done";
 #endif
     
@@ -1451,15 +1452,15 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
     int nleft = n - nel ;
     for (int pme = pme1 ; pme <= pme2 ; pme++)
     {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(pme,Iw,1291);
 #endif
       int i = Iw [pme] ;
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(i,Nv,1297);
 #endif
       int nvi = -Nv [i] ;
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       Rcpp::Rcout << "\nRestore i " << i << " " << nvi;
 #endif
       if (nvi > 0)
@@ -1467,13 +1468,13 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
         Nv[i] = nvi ;
         deg = Degree[i] + degme - nvi ;
         deg = deg < nleft - nvi ? deg : nleft - nvi;
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         CHECK_INDEX(deg,Head,1304);
 #endif
         int inext = Head [deg] ;
 
         if (inext != EMPTY) {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
           CHECK_INDEX(inext,P,1308);
 #endif
           P[inext] = i ;
@@ -1486,7 +1487,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
         Iw[p++] = i ;
       }
     }
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
     CHECK_INDEX(me,Nv,1320);
     Rcpp::Rcout << "\nRestore done";
     Rcpp::Rcout << "\n ME = " <<  me << " done";
@@ -1512,7 +1513,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
     info.s = info.f * info.r * info.r + info.r * (info.f - 1) * info.f + (info.f - 1) * info.f * (2 * info.f - 1) / 6;
     info.nms_lu += info.s;
     info.nms_ldl += (info.s + info.lnzme) / 2;
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
     Rcpp::Rcout << "\nFinalise done nel " << nel << " n " << n;
     for (int pme = Pe [me] ; pme <= Pe [me] + Len [me] - 1 ; pme++)
     {
@@ -1540,31 +1541,31 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
   {
     if (Nv[i] == 0)
     {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       Rcpp::Rcout << "\n Path compression, i unordered " << i;
 #endif
       int j = Pe [i] ;
       if (j == EMPTY){
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         CHECK_INDEX(j,Pe,1365);
         Rcpp::Rcout << "\n j: " << j << " is a dense variable";
 #endif
         continue;
       }
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(j,Pe,1365);
 #endif
       while (Nv [j] == 0)j = Pe[j];
       int e = j ;
       j = i ;
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(j,Nv,1371);
       Rcpp::Rcout << " j: " << j;
 #endif
       while (Nv [j] == 0)
       {
         int jnext = Pe [j] ;
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         Rcpp::Rcout << " j: " << j << " jnext " << jnext;
 #endif
         Pe [j] = e ;
@@ -1591,7 +1592,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
       int parent = Pe[j];
       if (parent != EMPTY)
       {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         CHECK_INDEX(parent,P,1396);
 #endif
         Pinv[j] = Head[parent];
@@ -1610,7 +1611,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
       int bigf = EMPTY;
       for (int f = Head[i]; f != EMPTY; f = Pinv[f])
       {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         CHECK_INDEX(f,Elen,1415);
 #endif
         int frsize = Elen[f];
@@ -1622,7 +1623,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
         }
         fprev = f;
       }
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       CHECK_INDEX(bigf,Pinv,1427);
 #endif
       int fnext = Pinv[bigf];
@@ -1636,7 +1637,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
         {
           Pinv[bigfprev] = fnext;
         }
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         CHECK_INDEX(bigf,Pinv,1441);
         CHECK_INDEX(fprev,Pinv,1442);
 #endif
@@ -1663,7 +1664,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
     if (k != EMPTY)Head[k] = e;
   }
   
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
   Rcpp::Rcout << "\nFinal reorder.\nTp:";
   for(const auto& i: Tp) Rcpp::Rcout << i << " ";
   Rcpp::Rcout << "\nHead:";
@@ -1680,7 +1681,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
     nel += Nv [e] ;
   }
 
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
   Rcpp::Rcout << "\nSet up Pinv. nel: " << nel << " Pe:\n";
   for(const auto& i: Pe) Rcpp::Rcout << i << " ";
 #endif
@@ -1692,7 +1693,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
       int e = Pe [i] ;
       if (e != EMPTY)
       {
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         CHECK_INDEX(e,Pinv,1482);
 #endif
         Pinv [i] = Pinv [e] ;
@@ -1705,7 +1706,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
     }
   }
   
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
   Rcpp::Rcout << "\nFinal loop. Pinv: ";
   for(const auto& i: Pinv) Rcpp::Rcout << i << " ";
 #endif
@@ -1713,7 +1714,7 @@ for(const auto& t: Iw) Rcpp::Rcout << t << " ";
   for (int i = 0 ; i < nn ; i++)
   {
     int k = Pinv[i];
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
     CHECK_INDEX(k,P,1498);
 #endif
     P[k] = i;

@@ -75,7 +75,7 @@ class SparseChol {
         Parent[k] = -1 ; // parent of k is not yet known */
         Flag[k] = k ; // mark node k as visited */
         Lnz[k] = 0 ; // count of nonzeros in column k of L */
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
       Rcpp::Rcout <<  "\nLDL Symbolic. Permuted: " << A_.use_permuted;  
 #endif
         kk = A_.use_permuted ? A_.P[k] : k;
@@ -112,7 +112,7 @@ class SparseChol {
         int top = n ; // stack for pattern is empty */
         Flag[k] = k ; // mark node k as visited */
         Lnz[k] = 0 ; // count of nonzeros in column k of L */
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG_SCHOL
         Rcpp::Rcout << "\nLDL Numeric. Permuted: " << A_.use_permuted;  
 #endif
         kk = A_.use_permuted ? A_.P[k] : k;
