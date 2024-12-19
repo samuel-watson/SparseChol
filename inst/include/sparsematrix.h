@@ -328,44 +328,66 @@ inline intvec sparse::permute_inv(){
 inline void sparse::insert(int row, int col, double x){
   // this will fail if the matrix is not initialised
   if(Ap.size()==0)Rcpp::stop("Matrix not properly initialised");
+  bool found = false;
+  int idx;
   if(rowMajor){
-    int p = 0;
-    if(Ap[row+1] - Ap[row] > 0){
-      for(int j = Ap[row]; j < Ap[row+1]; j++){
-        if(Ai[j] < col){
-          p++;
-        } else {
-          break;
-        }
+    for(idx = Ap[row]; idx < Ap[row+1]; idx++){
+      if(Ai[idx] == col){
+        found = true;
+        break;
       }
     }
-    if(Ap[row]+p >= Ai.size()){
-      Ai.push_back(col);
-      Ax.push_back(x);
+    if(found){
+      Ax[idx] = x;
     } else {
-      Ai.insert(Ai.begin()+Ap[row]+p,col);
-      Ax.insert(Ax.begin()+Ap[row]+p,x);
+      int p = 0;
+      if(Ap[row+1] - Ap[row] > 0){
+        for(int j = Ap[row]; j < Ap[row+1]; j++){
+          if(Ai[j] < col){
+            p++;
+          } else {
+            break;
+          }
+        }
+      }
+      if(Ap[row]+p >= Ai.size()){
+        Ai.push_back(col);
+        Ax.push_back(x);
+      } else {
+        Ai.insert(Ai.begin()+Ap[row]+p,col);
+        Ax.insert(Ax.begin()+Ap[row]+p,x);
+      }
+      for(int i = row+1; i < Ap.size(); i++)Ap[i]++;
     }
-    for(int i = row+1; i < Ap.size(); i++)Ap[i]++;
   } else {
-    int p = 0;
-    if(Ap[col+1] - Ap[col] > 0){
-      for(int j = Ap[col]; j < Ap[col+1]; j++){
-        if(Ai[j] < row){
-          p++;
-        } else {
-          break;
-        }
+    for(idx = Ap[col]; idx < Ap[col+1]; idx++){
+      if(Ai[idx] == row){
+        found = true;
+        break;
       }
     }
-    if(Ap[col]+p >= Ai.size()){
-      Ai.push_back(row);
-      Ax.push_back(x);
+    if(found){
+      Ax[idx] = x;
     } else {
-      Ai.insert(Ai.begin()+Ap[col]+p,row);
-      Ax.insert(Ax.begin()+Ap[col]+p,x);
+      int p = 0;
+      if(Ap[col+1] - Ap[col] > 0){
+        for(int j = Ap[col]; j < Ap[col+1]; j++){
+          if(Ai[j] < row){
+            p++;
+          } else {
+            break;
+          }
+        }
+      }
+      if(Ap[col]+p >= Ai.size()){
+        Ai.push_back(row);
+        Ax.push_back(x);
+      } else {
+        Ai.insert(Ai.begin()+Ap[col]+p,row);
+        Ax.insert(Ax.begin()+Ap[col]+p,x);
+      }
+      for(int i = col+1; i < Ap.size(); i++)Ap[i]++;
     }
-    for(int i = col+1; i < Ap.size(); i++)Ap[i]++;
   }
 }
 
